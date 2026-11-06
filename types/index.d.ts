@@ -1,4 +1,4 @@
-export type Step = { text: string; at: number; failed?: boolean }
+export type Step = { text: string; at: number; failed?: boolean; done?: boolean; secs?: number }
 
 declare module 'claude-code' {
   interface PluginState {

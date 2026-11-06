@@ -15,7 +15,7 @@ While a turn runs, a small band above the prompt shows:
 - **✓ / ✗** the last few steps and whether each one succeeded
 - the current step is also shown in the status line
 
-The band disappears when the turn ends. Subagent tool calls are ignored, so only the main conversation is shown.
+When the turn ends the band shows `■ Done · Ns` and stays up for 10 seconds so you can read it, then disappears. Subagent tool calls are ignored, so only the main conversation is shown.
 
 ## Install
 

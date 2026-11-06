@@ -1,6 +1,6 @@
 {
   "name": "heads-up",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Live heads-up of what Claude is doing right now: current step and recent steps above the prompt.",
   "types": "./types/index.d.ts",
   "license": "MIT",

@@ -8,6 +8,7 @@ const recent = atom({ plugin: 'heads-up', key: 'recent' } as const, [])
 const turnStart = atom({ plugin: 'heads-up', key: 'turnStart' } as const, 0)
 
 const MAX_RECENT = 4
+const LINGER_MS = 10_000 // keep the band up this long after the turn ends
 
 const short = (s: unknown, n = 60): string => {
   const t = String(s ?? '').replace(/\s+/g, ' ').trim()
@@ -71,18 +72,27 @@ export const register: Register = on => {
   }).catch(($, e, next) => next(e))
 
   on('turn.complete', async ($, e, next) => {
-    await update($, current, () => null)
-    $.ui.status(undefined)
-    return next(e)
-  })
-
-  on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
-    if (e.props.hasSurvey || !e.props.isWorking) return next(e)
-    const now = await read($, current)
-    if (now === null) return next(e)
-    const past = await read($, recent)
     const start = await read($, turnStart)
     const secs = start ? Math.max(0, Math.round(((await $.clock.now()) - start) / 1000)) : 0
+    const doneAt = await $.clock.now()
+    await update($, current, () => ({ text: 'Done', at: doneAt, secs, done: true }))
+    $.ui.status(undefined)
+    // Clear the band after a while, unless a new turn has started since.
+    $.clock.after(LINGER_MS, () =>
+      update($, current, c => (c?.done && c.at === doneAt ? null : c)),
+    )
+    return next(e)
+  }).catch(($, e, next) => next(e))
+
+  on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
+    if (e.props.hasSurvey) return next(e)
+    const now = await read($, current)
+    if (now === null || (!e.props.isWorking && !now.done)) return next(e)
+    const past = await read($, recent)
+    const start = await read($, turnStart)
+    const secs = now.done
+      ? (now.secs ?? 0)
+      : start ? Math.max(0, Math.round(((await $.clock.now()) - start) / 1000)) : 0
     const width = Math.max(20, e.props.bodyColumns - 4)
 
     const { Box, Text } = $.ui.resolve(e)
@@ -94,7 +104,7 @@ export const register: Register = on => {
           </Text>
         ))}
         <Text key="now" wrap="truncate">
-          <Text color="cyan" bold>▶ </Text>
+          {now.done ? <Text color="green" bold>■ </Text> : <Text color="cyan" bold>▶ </Text>}
           {short(now.text, width - 10)}
           <Text dimColor> · {secs}s</Text>
         </Text>
