@@ -1,0 +1,13 @@
+{
+  "name": "claude-heads-up",
+  "owner": {
+    "name": "mahse1n"
+  },
+  "plugins": [
+    {
+      "name": "heads-up",
+      "source": "./"
+    }
+  ],
+  "description": "Live heads-up of what Claude Code is doing right now."
+}

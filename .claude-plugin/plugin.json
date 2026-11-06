@@ -1,0 +1,10 @@
+{
+  "name": "heads-up",
+  "version": "0.1.0",
+  "description": "Live heads-up of what Claude is doing right now: current step and recent steps above the prompt.",
+  "types": "./types/index.d.ts",
+  "license": "MIT",
+  "author": {
+    "name": "mahse1n"
+  }
+}
